@@ -1,14 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", function(user) {
-      if (!user) {
-        window.netlifyIdentity.open();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>School of St Jude - Students Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 1. Netlify Identity widget script -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+  <style>
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0b1f3a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: system-ui, sans-serif;
+      z-index: 9999;
+    }
+    #login-overlay button {
+      padding: 12px 28px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    #denied-message {
+      color: #fca5a5;
+      margin-top: 12px;
+      display: none;
+    }
+    #real-content {
+      display: none; /* hidden until login + domain check passes */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== GATE: shown until login succeeds ===== -->
+  <div id="login-overlay">
+    <h1>School of St Jude — Students Data</h1>
+    <p>Please log in with your @schoolofstjude.co.tz account to continue.</p>
+    <button onclick="netlifyIdentity.open('login')">Log In</button>
+    <p id="denied-message">
+      Access denied. Only @schoolofstjude.co.tz accounts are allowed.
+    </p>
+  </div>
+
+  <!-- ===== YOUR REAL PAGE CONTENT GOES HERE ===== -->
+  <div id="real-content">
+    <h1>Welcome to the Students Data Portal</h1>
+    <p>This is the protected content of your original index.html.</p>
+    <!-- Replace this whole div's contents with everything your current
+         index.html had inside <body> -->
+  </div>
+
+  <script>
+    const ALLOWED_DOMAIN = "@schoolofstjude.co.tz";
+
+    function showRealContent() {
+      document.getElementById("login-overlay").style.display = "none";
+      document.getElementById("real-content").style.display = "block";
+    }
+
+    function showDenied() {
+      document.getElementById("denied-message").style.display = "block";
+      document.getElementById("real-content").style.display = "none";
+    }
+
+    function checkUser(user) {
+      if (!user) return; // not logged in, stay on gate
+      const email = (user.email || "").toLowerCase();
+      if (email.endsWith(ALLOWED_DOMAIN)) {
+        showRealContent();
+      } else {
+        // Logged in, but wrong domain — log them out and block
+        showDenied();
+        netlifyIdentity.logout();
       }
+    }
+
+    netlifyIdentity.on("init", (user) => checkUser(user));
+    netlifyIdentity.on("login", (user) => checkUser(user));
+    netlifyIdentity.on("logout", () => {
+      document.getElementById("login-overlay").style.display = "flex";
+      document.getElementById("real-content").style.display = "none";
     });
-  }
-</script>
+
+    netlifyIdentity.init();
+  </script>
+
+</body>
+</html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
