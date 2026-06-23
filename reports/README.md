@@ -1,0 +1,1 @@
+# Folder structure for organizating dashboard files
